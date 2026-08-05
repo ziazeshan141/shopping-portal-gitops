@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ziazeshan141/shopping-adminserver
-  tag: "1"
+  tag: "13"
   pullPolicy: IfNotPresent
 
 containerPort: 8081
