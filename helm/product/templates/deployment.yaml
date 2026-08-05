@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product
+  labels:
+    app: product
+spec:
+  replicas: {{ .Values.replicaCount }}
+
+  selector:
+    matchLabels:
+      app: product
+
+  template:
+    metadata:
+      labels:
+        app: product
+
+    spec:
+      containers:
+        - name: product
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPort }}
+
+          env:
+            - name: SERVER_PORT
+              value: "{{ .Values.containerPort }}"
+
+            - name: MONGODB_URI
+              value: "{{ .Values.config.mongodbUri }}"
+
+            - name: ADMIN_SERVER_URL
+              value: "{{ .Values.config.adminServerUrl }}"
+
+            - name: SERVICE_BASE_URL
+              value: "{{ .Values.config.serviceBaseUrl }}"
+
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 20
+
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+            limits:
+              memory: 512Mi
+              cpu: 500m

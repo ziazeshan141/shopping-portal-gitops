@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userservice
+  labels:
+    app: userservice
+spec:
+  replicas: {{ .Values.replicaCount }}
+
+  selector:
+    matchLabels:
+      app: userservice
+
+  template:
+    metadata:
+      labels:
+        app: userservice
+
+    spec:
+      containers:
+        - name: userservice
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPort }}
+
+          env:
+            - name: SERVER_PORT
+              value: "{{ .Values.containerPort }}"
+
+            - name: DB_URL
+              value: "{{ .Values.config.dbUrl }}"
+
+            - name: DB_USERNAME
+              value: "{{ .Values.config.dbUsername }}"
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shopping-secrets
+                  key: mysql-root-password
+
+            - name: APP_SECURITY_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: shopping-secrets
+                  key: app-security-username
+
+            - name: APP_SECURITY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shopping-secrets
+                  key: app-security-password
+
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 20
+
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+            limits:
+              memory: 512Mi
+              cpu: 500m

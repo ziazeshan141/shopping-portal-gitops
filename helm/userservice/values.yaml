@@ -1,0 +1,16 @@
+replicaCount: 1
+
+image:
+  repository: ziazeshan141/shopping-userservice
+  tag: "1"
+  pullPolicy: IfNotPresent
+
+containerPort: 9092
+
+service:
+  type: ClusterIP
+  port: 9092
+
+config:
+  dbUrl: jdbc:mysql://mysql:3306/user_management?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+  dbUsername: root

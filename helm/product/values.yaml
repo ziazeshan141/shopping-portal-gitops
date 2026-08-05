@@ -1,0 +1,17 @@
+replicaCount: 1
+
+image:
+  repository: ziazeshan141/shopping-product
+  tag: "1"
+  pullPolicy: IfNotPresent
+
+containerPort: 9091
+
+service:
+  type: ClusterIP
+  port: 9091
+
+config:
+  mongodbUri: mongodb://mongodb:27017/shopping
+  adminServerUrl: http://adminserver:8081
+  serviceBaseUrl: http://product:9091

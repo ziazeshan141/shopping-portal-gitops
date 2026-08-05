@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: userservice
+  labels:
+    app: userservice
+spec:
+  type: {{ .Values.service.type }}
+
+  selector:
+    app: userservice
+
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http

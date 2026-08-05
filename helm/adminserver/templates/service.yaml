@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: adminserver
+  labels:
+    app: adminserver
+spec:
+  type: {{ .Values.service.type }}
+
+  selector:
+    app: adminserver
+
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http
