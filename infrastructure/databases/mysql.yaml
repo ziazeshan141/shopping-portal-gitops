@@ -27,6 +27,7 @@ metadata:
   name: mysql-pvc
   namespace: shopping
 spec:
+  storageClassName: gp2
   accessModes:
     - ReadWriteOnce
   resources:
