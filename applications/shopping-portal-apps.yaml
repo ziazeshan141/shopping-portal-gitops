@@ -1,0 +1,76 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: shopping-adminserver
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/ziazeshan141/shopping-portal-gitops.git
+    targetRevision: main
+    path: helm/adminserver
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: shopping
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: shopping-product
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/ziazeshan141/shopping-portal-gitops.git
+    targetRevision: main
+    path: helm/product
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: shopping
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: shopping-userservice
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/ziazeshan141/shopping-portal-gitops.git
+    targetRevision: main
+    path: helm/userservice
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: shopping
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true
