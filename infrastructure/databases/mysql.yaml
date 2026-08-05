@@ -1,0 +1,136 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-script
+  namespace: shopping
+data:
+  01-user-schema.sql: |
+    CREATE DATABASE IF NOT EXISTS user_management;
+
+    USE user_management;
+
+    CREATE TABLE IF NOT EXISTS users (
+        id VARCHAR(40) NOT NULL,
+        name VARCHAR(20),
+        email VARCHAR(100) UNIQUE,
+        mobile VARCHAR(20) UNIQUE,
+        password VARCHAR(100),
+        insert_date DATE,
+        expire_date DATE,
+        PRIMARY KEY (id)
+    );
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: shopping
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: shopping
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: mysql
+
+  template:
+    metadata:
+      labels:
+        app: mysql
+
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - name: mysql
+              containerPort: 3306
+
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shopping-secrets
+                  key: mysql-root-password
+
+            - name: MYSQL_DATABASE
+              value: user_management
+
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+
+            - name: mysql-init
+              mountPath: /docker-entrypoint-initdb.d
+              readOnly: true
+
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - mysqladmin ping -h 127.0.0.1 -uroot -p"$MYSQL_ROOT_PASSWORD"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 10
+
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - mysqladmin ping -h 127.0.0.1 -uroot -p"$MYSQL_ROOT_PASSWORD"
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+
+        - name: mysql-init
+          configMap:
+            name: mysql-init-script
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: shopping
+spec:
+  type: ClusterIP
+
+  selector:
+    app: mysql
+
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: mysql

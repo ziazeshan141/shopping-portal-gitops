@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ziazeshan141/shopping-userservice
-  tag: "1"
+  tag: "12"
   pullPolicy: IfNotPresent
 
 containerPort: 9092
