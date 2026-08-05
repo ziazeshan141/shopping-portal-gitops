@@ -2,11 +2,7 @@ replicaCount: 1
 
 image:
   repository: ziazeshan141/shopping-product
-<<<<<<< HEAD
-  tag: "12"
-=======
   tag: "13"
->>>>>>> a05a5d289e9ee5735bc9600d18f318434fdcf62f
   pullPolicy: IfNotPresent
 
 containerPort: 9091
