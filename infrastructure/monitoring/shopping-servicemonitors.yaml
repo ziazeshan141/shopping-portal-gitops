@@ -1,0 +1,76 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: shopping-adminserver
+  namespace: shopping
+  labels:
+    release: shopping-monitoring
+spec:
+  namespaceSelector:
+    matchNames:
+      - shopping
+
+  selector:
+    matchLabels:
+      app: adminserver
+
+  endpoints:
+    - port: http
+      path: /actuator/prometheus
+      interval: 30s
+      scrapeTimeout: 10s
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: shopping-product
+  namespace: shopping
+  labels:
+    release: shopping-monitoring
+spec:
+  namespaceSelector:
+    matchNames:
+      - shopping
+
+  selector:
+    matchLabels:
+      app: product
+
+  endpoints:
+    - port: http
+      path: /actuator/prometheus
+      interval: 30s
+      scrapeTimeout: 10s
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: shopping-userservice
+  namespace: shopping
+  labels:
+    release: shopping-monitoring
+spec:
+  namespaceSelector:
+    matchNames:
+      - shopping
+
+  selector:
+    matchLabels:
+      app: userservice
+
+  endpoints:
+    - port: http
+      path: /actuator/prometheus
+      interval: 30s
+      scrapeTimeout: 10s
+
+      basicAuth:
+        username:
+          name: shopping-secrets
+          key: app-security-username
+
+        password:
+          name: shopping-secrets
+          key: app-security-password
