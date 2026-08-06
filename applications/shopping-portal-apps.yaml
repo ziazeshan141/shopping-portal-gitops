@@ -41,6 +41,14 @@ spec:
     server: https://kubernetes.default.svc
     namespace: shopping
 
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: product
+      namespace: shopping
+      jsonPointers:
+        - /spec/replicas
+
   syncPolicy:
     automated:
       prune: true
@@ -48,6 +56,7 @@ spec:
 
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true
 
 ---
 apiVersion: argoproj.io/v1alpha1
@@ -67,6 +76,14 @@ spec:
     server: https://kubernetes.default.svc
     namespace: shopping
 
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: userservice
+      namespace: shopping
+      jsonPointers:
+        - /spec/replicas
+
   syncPolicy:
     automated:
       prune: true
@@ -74,3 +91,4 @@ spec:
 
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true
